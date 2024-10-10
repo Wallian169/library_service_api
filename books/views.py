@@ -1,6 +1,5 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, AllowAny
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from books.models import Book
 from books.serializers import BookSerializer
