@@ -21,7 +21,7 @@ class BorrowingViewSet(
     ListModelMixin,
     GenericViewSet,
 ):
-    queryset = Borrowing.objects.all()
+    queryset = Borrowing.objects.select_related("book_id")
     serializer_class = BorrowingListSerializer
     permission_classes = [IsAuthenticated]
 
@@ -34,3 +34,11 @@ class BorrowingViewSet(
 
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.action == "list":
+            if self.request.user.is_superuser:
+                return queryset
+            queryset = queryset.filter(user_id=self.request.user)
+        return queryset
