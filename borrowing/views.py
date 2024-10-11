@@ -1,5 +1,11 @@
 from rest_framework import viewsets, permissions
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import (
+    ListModelMixin,
+    CreateModelMixin,
+    RetrieveModelMixin,
+)
 
 from borrowing.models import Borrowing
 from borrowing.serializers import (
@@ -9,7 +15,12 @@ from borrowing.serializers import (
 )
 
 
-class BorrowingViewSet(viewsets.ModelViewSet):
+class BorrowingViewSet(
+    CreateModelMixin,
+    RetrieveModelMixin,
+    ListModelMixin,
+    GenericViewSet,
+):
     queryset = Borrowing.objects.all()
     serializer_class = BorrowingListSerializer
     permission_classes = [IsAuthenticated]
