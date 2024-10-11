@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, AllowAny
 
 from books.models import Book
-from books.serializers import BookSerializer
+from books.serializers import BookSerializer, BookListSerializer
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -16,3 +16,8 @@ class BookViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = [IsAdminUser]
         return super(BookViewSet, self).get_permissions()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return BookListSerializer
+        return self.serializer_class
