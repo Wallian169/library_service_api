@@ -22,7 +22,7 @@ class BorrowingViewSet(
     GenericViewSet,
 ):
     queryset = Borrowing.objects.select_related("book_id").order_by(
-        actual_return_date__isnull=True
+        "actual_return_date"
     )
     serializer_class = BorrowingListSerializer
     permission_classes = [IsAuthenticated]
@@ -39,11 +39,15 @@ class BorrowingViewSet(
 
     def get_queryset(self):
         is_active = self.request.query_params.get("is_active")
+        user_id = self.request.query_params.get("user_id")
         queryset = self.queryset
 
         if self.action == "list":
             if not self.request.user.is_superuser:
                 queryset = queryset.filter(user_id=self.request.user)
+            else:
+                if user_id:
+                    queryset = queryset.filter(user_id=user_id)
 
             if is_active and is_active.lower() == "true":
                 queryset = queryset.filter(actual_return_date__isnull=True)
