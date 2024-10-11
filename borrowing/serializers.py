@@ -51,3 +51,11 @@ class BorrowingDetailSerializer(BorrowingListSerializer):
             "actual_return_date",
             "book_info",
         )
+
+
+class BorrowingReturnSerializer(serializers.ModelSerializer):
+    actual_return_date = serializers.DateField(read_only=True)
+
+    class Meta:
+        model = Borrowing
+        fields = ["actual_return_date"]
