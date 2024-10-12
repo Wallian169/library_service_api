@@ -1,5 +1,7 @@
 from django.db import transaction
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -33,6 +35,11 @@ class BorrowingViewSet(
     serializer_class = BorrowingListSerializer
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=None,
+        responses={200: BorrowingReturnSerializer},
+        description="Return a borrowed book and update its inventory.",
+    )
     @action(detail=True, methods=["POST"], url_path="return")
     @transaction.atomic
     def return_borrowing(self, request, pk=None):
@@ -51,6 +58,25 @@ class BorrowingViewSet(
         serializer = BorrowingReturnSerializer(borrowing)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "is_active",
+                type=OpenApiTypes.STR,
+                description="Filter by status of borrowings (ex. ?is_active=true)",
+            ),
+            OpenApiParameter(
+                "user_id",
+                type=OpenApiTypes.INT,
+                description=(
+                    "Filter borrowings by concrete user via id " "(ex. ?user_id=2)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action == "create":
